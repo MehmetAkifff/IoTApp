@@ -1,0 +1,1 @@
+This is the project of 351 Design Patterns lecture by Seher Oğuz, Mehmet Akif Ergani, Zeynep Meryem Sertgöz.

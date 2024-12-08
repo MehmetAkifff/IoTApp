@@ -4,20 +4,22 @@ class GarageDoor implements Device {
   bool _isOn = false;
 
   @override
-  String get name => 'GarageDoor';
+  String getName() => "Garage Door";
 
   @override
-  void turnOn() {
-    _isOn = true;
-    print('Garage door is now ON.');
+  void turnOn() => _isOn = true;
+
+  @override
+  void turnOff() => _isOn = false;
+
+  @override
+  bool isOn() => _isOn;
+
+  @override
+  Map<String, dynamic>? getSettingsSchema() => null; // Ayar şeması yok
+
+  @override
+  void applySettings(Map<String, dynamic> settings) {
+    // GarageDoor ayarları olmadığı için hiçbir şey yapmaz
   }
-
-  @override
-  void turnOff() {
-    _isOn = false;
-    print('Garage door is now OFF.');
-  }
-
-  @override
-  bool get isOn => _isOn;
 }

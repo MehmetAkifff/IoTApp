@@ -1,68 +1,57 @@
-import 'dart:async';
 import '../device.dart';
-import '../../observer/device_status_observer.dart';
-import 'dish_washer_settings.dart';
 
 class DishWasher implements Device {
   bool _isOn = false;
-  DishWasherSettings? _settings;
-  final List<DeviceStatusObserver> _observers = [];
-
-  // Gözlemci ekleme
-  void addObserver(DeviceStatusObserver observer) {
-    _observers.add(observer);
-  }
-
-  void _notifyObservers(String message) {
-    for (final observer in _observers) {
-      observer.update(message);
-    }
-  }
+  Map<String, dynamic>? _settings;
 
   @override
-  String get name => 'DishWasher';
+  String getName() => "Dish Washer";
 
   @override
   void turnOn() {
-    if (_isOn) {
-      print('Error: Dishwasher is already ON.');
-      return;
-    }
-    if (_settings == null) {
-      print('Error: Please configure dishwasher settings before starting!');
+    if (_settings == null || _settings!["Mode"] == null) {
+      print("Error: Please configure the washing mode before starting the machine.");
       return;
     }
     _isOn = true;
-    print('Dishwasher is now ON with the following settings:');
-    print(_settings);
+    print("Dish Washer is now ON with settings: $_settings");
 
-    // Program süresi boyunca çalışmayı simüle et
-    Timer(Duration(seconds: _settings!.duration), () {
+    // Simulate operation
+    Future.delayed(const Duration(seconds: 5), () {
       _isOn = false;
-      print('Dishwasher has completed the ${_settings!.mode} program.');
-      _notifyObservers('Dishwasher completed: ${_settings!.mode}.');
+      print("Dish Washer operation completed.");
     });
   }
 
   @override
   void turnOff() {
     if (!_isOn) {
-      print('Error: Dishwasher is already OFF.');
+      print("Error: Dish Washer is already OFF.");
       return;
     }
     _isOn = false;
-    print('Dishwasher is now OFF.');
+    print("Dish Washer is now OFF.");
   }
 
   @override
-  bool get isOn => _isOn;
+  bool isOn() => _isOn;
 
-  void setSettings(DishWasherSettings settings) {
-    if (_isOn) {
-      print('Error: Cannot change settings while the Dishwasher is ON.');
+  @override
+  Map<String, dynamic>? getSettingsSchema() {
+    return {
+      "Mode": ["Quick Wash", "Eco", "Intensive", "Rinse Only"],
+      "Temperature": {"min": 30, "max": 90, "default": 60},
+      "Drying Level": ["No Drying", "Normal Drying", "Extra Dry"],
+    };
+  }
+
+  @override
+  void applySettings(Map<String, dynamic> settings) {
+    if (!settings.containsKey("Mode") || !settings.containsKey("Temperature")) {
+      print("Error: Invalid settings. Mode and Temperature are required.");
       return;
     }
     _settings = settings;
-    print('Settings applied: $settings');
+    print("Dish Washer settings applied: $_settings");
   }
 }

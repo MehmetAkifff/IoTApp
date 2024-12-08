@@ -4,8 +4,8 @@ class WashingMachineSettings {
   final int spinSpeed;
   final int duration;
 
-  // Private Constructor
-  WashingMachineSettings._({
+  // Constructor
+  WashingMachineSettings({
     required this.mode,
     required this.temperature,
     required this.spinSpeed,
@@ -24,46 +24,55 @@ class WashingMachineSettingsBuilder {
   int? _spinSpeed;
   int _duration = 0;
 
-  // Mod seçimi
+  // Predefined modes and their corresponding durations
+  static const Map<String, int> predefinedModes = {
+    'Quick Wash': 20, // Duration in seconds
+    'Daily Wash': 40,
+    'Intensive Wash': 60,
+    'Energy Saving': 50,
+  };
+
+  /// Set the mode and automatically configure its duration
   WashingMachineSettingsBuilder setMode(String mode) {
-    _mode = mode;
-    switch (mode) {
-      case 'Quick Wash':
-        _duration = 2; // 20 saniye
-        break;
-      case 'Daily Wash':
-        _duration = 4; // 40 saniye
-        break;
-      case 'Intensive Wash':
-        _duration = 6; // 60 saniye
-        break;
-      case 'Energy Saving':
-        _duration = 5; // 50 saniye
-        break;
-      default:
-        throw ArgumentError('Invalid mode: $mode');
+    if (!predefinedModes.containsKey(mode)) {
+      throw ArgumentError('Invalid mode: $mode');
     }
+    _mode = mode;
+    _duration = predefinedModes[mode]!;
     return this;
   }
 
-  // Sıcaklık ayarı
+  /// Set the washing temperature
   WashingMachineSettingsBuilder setTemperature(int temperature) {
+    if (temperature < 0 || temperature > 90) {
+      throw ArgumentError('Temperature must be between 0 and 90°C.');
+    }
     _temperature = temperature;
     return this;
   }
 
-  // Spin hız ayarı
+  /// Set the spin speed
   WashingMachineSettingsBuilder setSpinSpeed(int spinSpeed) {
+    if (spinSpeed < 400 || spinSpeed > 1600) {
+      throw ArgumentError('Spin speed must be between 400 and 1600 RPM.');
+    }
     _spinSpeed = spinSpeed;
     return this;
   }
 
-  // WashingMachineSettings oluştur
+  /// Build the WashingMachineSettings object
   WashingMachineSettings build() {
-    if (_mode == null || _temperature == null || _spinSpeed == null) {
-      throw StateError('All fields must be set before building the settings.');
+    if (_mode == null) {
+      throw StateError('Mode must be set before building the settings.');
     }
-    return WashingMachineSettings._(
+    if (_temperature == null) {
+      throw StateError('Temperature must be set before building the settings.');
+    }
+    if (_spinSpeed == null) {
+      throw StateError('Spin speed must be set before building the settings.');
+    }
+
+    return WashingMachineSettings(
       mode: _mode!,
       temperature: _temperature!,
       spinSpeed: _spinSpeed!,

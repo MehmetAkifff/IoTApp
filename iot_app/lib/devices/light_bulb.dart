@@ -4,20 +4,22 @@ class LightBulb implements Device {
   bool _isOn = false;
 
   @override
-  String get name => 'LightBulb';
+  String getName() => "Light Bulb";
 
   @override
-  void turnOn() {
-    _isOn = true;
-    print('LightBulb is now ON.');
+  void turnOn() => _isOn = true;
+
+  @override
+  void turnOff() => _isOn = false;
+
+  @override
+  bool isOn() => _isOn;
+
+  @override
+  Map<String, dynamic>? getSettingsSchema() => null; // Ayar şeması yok
+
+  @override
+  void applySettings(Map<String, dynamic> settings) {
+    // LightBulb ayarları olmadığı için hiçbir şey yapmaz
   }
-
-  @override
-  void turnOff() {
-    _isOn = false;
-    print('LightBulb is now OFF.');
-  }
-
-  @override
-  bool get isOn => _isOn;
 }

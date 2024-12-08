@@ -1,6 +1,8 @@
 abstract class Device {
-  String get name;
+  String getName();
   void turnOn();
   void turnOff();
-  bool get isOn;
+  bool isOn();
+  Map<String, dynamic>? getSettingsSchema(); // Ayar şeması
+  void applySettings(Map<String, dynamic> settings); // Ayarları uygular
 }

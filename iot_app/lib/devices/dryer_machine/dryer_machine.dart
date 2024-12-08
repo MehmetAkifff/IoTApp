@@ -1,68 +1,57 @@
-import 'dart:async';
 import '../device.dart';
-import '../../observer/device_status_observer.dart';
-import 'dryer_machine_settings.dart';
 
 class DryerMachine implements Device {
   bool _isOn = false;
-  DryerMachineSettings? _settings;
-  final List<DeviceStatusObserver> _observers = [];
-
-  // Gözlemci ekleme
-  void addObserver(DeviceStatusObserver observer) {
-    _observers.add(observer);
-  }
-
-  void _notifyObservers(String message) {
-    for (final observer in _observers) {
-      observer.update(message);
-    }
-  }
+  Map<String, dynamic>? _settings;
 
   @override
-  String get name => 'DryerMachine';
+  String getName() => "Dryer Machine";
 
   @override
   void turnOn() {
-    if (_isOn) {
-      print('Error: DryerMachine is already ON.');
-      return;
-    }
-    if (_settings == null) {
-      print('Error: Please configure dryer machine settings before starting!');
+    if (_settings == null || _settings!["Mode"] == null) {
+      print("Error: Please configure the drying mode before starting the machine.");
       return;
     }
     _isOn = true;
-    print('DryerMachine is now ON with the following settings:');
-    print(_settings);
+    print("Dryer Machine is now ON with settings: $_settings");
 
-    // Mod süresi boyunca çalışmayı simüle et
-    Timer(Duration(seconds: _settings!.duration), () {
+    // Simulate operation
+    Future.delayed(const Duration(seconds: 5), () {
       _isOn = false;
-      print('DryerMachine has completed the ${_settings!.mode} mode.');
-      _notifyObservers('DryerMachine completed: ${_settings!.mode}.');
+      print("Dryer Machine operation completed.");
     });
   }
 
   @override
   void turnOff() {
     if (!_isOn) {
-      print('Error: DryerMachine is already OFF.');
+      print("Error: Dryer Machine is already OFF.");
       return;
     }
     _isOn = false;
-    print('DryerMachine is now OFF.');
+    print("Dryer Machine is now OFF.");
   }
 
   @override
-  bool get isOn => _isOn;
+  bool isOn() => _isOn;
 
-  void setSettings(DryerMachineSettings settings) {
-    if (_isOn) {
-      print('Error: Cannot change settings while the DryerMachine is ON.');
+  @override
+  Map<String, dynamic>? getSettingsSchema() {
+    return {
+      "Mode": ["Quick Dry", "Delicates", "Normal", "Heavy"],
+      "Temperature": {"min": 30, "max": 90, "default": 60},
+      "Dryness Level": ["Damp", "Normal", "Extra Dry"],
+    };
+  }
+
+  @override
+  void applySettings(Map<String, dynamic> settings) {
+    if (!settings.containsKey("Mode") || !settings.containsKey("Temperature")) {
+      print("Error: Invalid settings. Mode and Temperature are required.");
       return;
     }
     _settings = settings;
-    print('Settings applied: $settings');
+    print("Dryer Machine settings applied: $_settings");
   }
 }

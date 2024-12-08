@@ -1,68 +1,48 @@
-import 'dart:async';
 import '../device.dart';
-import '../../observer/device_status_observer.dart';
-import 'air_conditioner_settings.dart';
 
 class AirConditioner implements Device {
   bool _isOn = false;
-  AirConditionerSettings? _settings;
-  final List<DeviceStatusObserver> _observers = [];
-
-  // Gözlemci ekleme
-  void addObserver(DeviceStatusObserver observer) {
-    _observers.add(observer);
-  }
-
-  void _notifyObservers(String message) {
-    for (final observer in _observers) {
-      observer.update(message);
-    }
-  }
+  Map<String, dynamic>? _settings;
 
   @override
-  String get name => 'Air Conditioner';
+  String getName() => "Air Conditioner";
 
   @override
   void turnOn() {
-    if (_isOn) {
-      print('Error: Air Conditioner is already ON.');
-      return;
-    }
-    if (_settings == null) {
-      print('Error: Please configure Air Conditioner settings before starting!');
-      return;
-    }
     _isOn = true;
-    print('Air Conditioner is now ON with the following settings:');
-    print(_settings);
+    print("Air Conditioner is now ON with settings: $_settings");
 
-    // Program süresi boyunca çalışmayı simüle et
-    Timer(Duration(seconds: _settings!.duration), () {
+    // Simulate operation
+    Future.delayed(const Duration(seconds: 5), () {
       _isOn = false;
-      print('Air Conditioner has completed the ${_settings!.mode} program.');
-      _notifyObservers('Air Conditioner completed: ${_settings!.mode}.');
+      print("Air Conditioner operation completed.");
     });
   }
 
   @override
   void turnOff() {
-    if (!_isOn) {
-      print('Error: Air Conditioner is already OFF.');
-      return;
-    }
     _isOn = false;
-    print('Air Conditioner is now OFF.');
+    print("Air Conditioner is now OFF.");
   }
 
   @override
-  bool get isOn => _isOn;
+  bool isOn() => _isOn;
 
-  void setSettings(AirConditionerSettings settings) {
-    if (_isOn) {
-      print('Error: Cannot change settings while the Air Conditioner is ON.');
-      return;
+  @override
+  Map<String, dynamic>? getSettingsSchema() {
+    if (!_isOn) {
+      return null;
     }
+    return {
+      "Mode": ["Cool", "Heat", "Fan", "Dry", "Auto"],
+      "Temperature": {"min": 16, "max": 30, "default": 22, "step": 1},
+      "Fan Speed": ["Low", "Medium", "High", "Auto"],
+    };
+  }
+
+  @override
+  void applySettings(Map<String, dynamic> settings) {
     _settings = settings;
-    print('Settings applied: $settings');
+    print("Air Conditioner settings applied: $_settings");
   }
 }
